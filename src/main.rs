@@ -1,36 +1,39 @@
+mod password_utils;
+mod models;
+mod views;
+
 #[macro_use]
 extern crate rocket;
 
 use std::env;
 use dotenv::dotenv;
+use rocket::serde::json::{Json, serde_json};
 use sqlx::postgres::PgPoolOptions;
+use serde::{Deserialize, Serialize};
+use sqlx::{Error, PgPool};
+use models::user;
+use rocket::response::status;
+use crate::password_utils::{create_jwt, get_email_from_token};
+use crate::views::register::register;
+use crate::views::check_access_token::check_access_token;
 
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[get("/test/sqlx")]
-async fn test_sqlx() -> String {
-    let db_uri = env::var("DATABASE_URI").expect("DATABASE_URI not provided in .env");
-
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&*db_uri).await.expect("Pool was not created");
-
-    // Make a simple query to return the given parameter (use a question mark `?` instead of `$1` for MySQL)
-    let row: (i64,) = sqlx::query_as("SELECT $1")
-        .bind(150_i64)
-        .fetch_one(&pool).await.expect("Fetch failed");
-
-    row.0.to_string()
-}
 
 #[launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
     dotenv().ok();
 
+    let db_uri = env::var("DATABASE_URL").expect("DATABASE_URI not provided in .env");
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&db_uri).await.expect("Pool was not created");
+
     rocket::build()
+        .manage::<PgPool>(pool)
         .mount("/", routes![index])
-        .mount("/", routes![test_sqlx])
+        .mount("/auth", routes![register, check_access_token])
 }

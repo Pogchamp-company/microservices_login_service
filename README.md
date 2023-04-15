@@ -10,8 +10,9 @@ Create .env file
 
 | Variable name | Example                                                     |
 |---------------|-------------------------------------------------------------|
-| DATABASE_URI  | postgresql://username:password@localhost:5432/login_service |
-
+| DATABASE_URL  | postgresql://username:password@localhost:5432/login_service |
+| SECURITY_SALT | kjdjkhnsdkjfhsjkdhkjasdhkjdshf                              |
+| JWT_SALT      | sddladkjsdfkjsdlfjsdfj                                      |
 
 ```
 cargo run
