@@ -14,6 +14,7 @@ use models::user;
 use password_utils::{create_jwt, get_email_from_token};
 use views::check_access_token::check_access_token;
 use views::register::register;
+use views::login::login;
 
 mod password_utils;
 mod models;
@@ -37,5 +38,5 @@ async fn rocket() -> _ {
     rocket::build()
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
-        .mount("/auth", routes![register, check_access_token])
+        .mount("/auth", routes![register, check_access_token, login])
 }
