@@ -28,6 +28,6 @@ pub async fn register(user_login: Json<RegisterRequest>,
     }
 
     return Ok(Json(RegisterResponse {
-        token: password_utils::create_jwt(&user_login.login, &hashed_password)
+        token: password_utils::create_jwt(&user_login.login)
     }));
 }

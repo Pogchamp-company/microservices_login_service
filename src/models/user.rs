@@ -1,8 +1,8 @@
 use rocket::execute;
-use sqlx::{Error, Executor, PgPool};
+use sqlx::{Executor, PgPool};
 use sqlx::postgres::PgQueryResult;
 
-pub async fn create_user(login: &String, password: &String, poll: &PgPool) -> Result<(), sqlx::Error> {
+pub async fn create_user(login: &str, password: &str, poll: &PgPool) -> Result<(), sqlx::Error> {
     let result = sqlx::query!(r#"
         INSERT INTO "user" VALUES ($1, $2)
     "#, login, password)
@@ -28,7 +28,7 @@ pub async fn load_user(email: &str, poll: &PgPool) -> Result<LoadUserUserResult,
             })
         }
         Err(err) => match err {
-            Error::RowNotFound => {
+            sqlx::Error::RowNotFound => {
                 // todo Probably telling about that is bad idea
                 Err("Пользователя с данной почтой не существует".to_string())
             }

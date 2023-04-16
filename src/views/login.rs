@@ -36,6 +36,6 @@ pub async fn login(login_request: Json<LoginRequest>,
     }
 
     Ok(Json(LoginResponse{
-        token: create_jwt(&user.email, &user.password),
+        token: create_jwt(&user.email),
     }))
 }
