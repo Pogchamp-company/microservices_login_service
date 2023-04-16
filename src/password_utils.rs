@@ -1,16 +1,15 @@
+use std::collections::BTreeMap;
 use std::env;
+use std::time::{Duration, SystemTime};
 
 use base64ct::{Base64, Encoding};
-use sha2::Sha256;
-use sha2::Digest;
-use sha2::digest;
-
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
-use std::collections::BTreeMap;
-use std::time::{Duration, SystemTime};
 use rocket::serde::json::serde_json;
 use serde::Serialize;
+use sha2::Digest;
+use sha2::digest;
+use sha2::Sha256;
 
 pub fn hash_password(password: &String) -> String {
     let mut hasher = Sha256::new();

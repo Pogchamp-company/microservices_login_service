@@ -1,10 +1,10 @@
 use rocket::response::status;
 use rocket::serde::json::Json;
-use sqlx::PgPool;
-use crate::password_utils::get_email_from_token;
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+
+use crate::password_utils::get_email_from_token;
 use crate::views::base::ErrorJson;
-use crate::views::register::register;
 
 #[derive(Debug, Deserialize)]
 pub struct AccessTokenRequest {
@@ -23,7 +23,6 @@ pub async fn check_access_token(access_token_request: Json<AccessTokenRequest>,
 
     return match get_email_from_token(&access_token_request.token) {
         Ok(email) => {
-
             Ok(Json(AccessTokenResponse {
                 email
                 // todo Return user roles

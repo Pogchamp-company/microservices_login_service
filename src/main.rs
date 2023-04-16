@@ -1,21 +1,23 @@
-mod password_utils;
-mod models;
-mod views;
-
 #[macro_use]
 extern crate rocket;
 
 use std::env;
+
 use dotenv::dotenv;
+use rocket::response::status;
 use rocket::serde::json::{Json, serde_json};
-use sqlx::postgres::PgPoolOptions;
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, PgPool};
+use sqlx::postgres::PgPoolOptions;
+
 use models::user;
-use rocket::response::status;
-use crate::password_utils::{create_jwt, get_email_from_token};
-use crate::views::register::register;
-use crate::views::check_access_token::check_access_token;
+use password_utils::{create_jwt, get_email_from_token};
+use views::check_access_token::check_access_token;
+use views::register::register;
+
+mod password_utils;
+mod models;
+mod views;
 
 #[get("/")]
 fn index() -> &'static str {

@@ -1,9 +1,9 @@
 use rocket::response::status;
 use rocket::serde::json::Json;
-use sqlx::PgPool;
-use crate::{models, password_utils};
-use crate::password_utils::create_jwt;
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+
+use crate::{models, password_utils};
 use crate::views::base::ErrorJson;
 
 #[derive(Debug, Deserialize)]
@@ -30,6 +30,6 @@ pub async fn register(user_login: Json<UserLoginRequest>,
     }
 
     return Ok(Json(UserLoginResponse {
-        token: create_jwt(&user_login.login, &hashed_password)
+        token: password_utils::create_jwt(&user_login.login, &hashed_password)
     }));
 }
