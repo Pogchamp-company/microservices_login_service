@@ -4,17 +4,12 @@ extern crate rocket;
 use std::env;
 
 use dotenv::dotenv;
-use rocket::response::status;
-use rocket::serde::json::{Json, serde_json};
-use serde::{Deserialize, Serialize};
-use sqlx::{Error, PgPool};
+use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 
-use models::user;
-use password_utils::{create_jwt, get_email_from_token};
 use views::check_access_token::check_access_token;
-use views::register::register;
 use views::login::login;
+use views::register::register;
 
 mod password_utils;
 mod models;

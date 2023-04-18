@@ -1,11 +1,9 @@
-use rocket::execute;
-use sqlx::{Executor, PgPool};
-use sqlx::postgres::PgQueryResult;
-use serde::{Serialize};
+use serde::Serialize;
+use sqlx::PgPool;
 
 #[derive(sqlx::Type, Debug, Serialize)]
 #[serde(rename_all = "snake_case")]
-#[sqlx(rename = "user_role", rename_all = "snake_case")]
+#[sqlx(type_name = "user_role", rename_all = "snake_case")]
 pub enum UserRole {
     TaskManager,
     HumanResources,
@@ -28,7 +26,6 @@ pub struct LoadUserUserResult {
 }
 
 pub async fn load_user(email: &str, poll: &PgPool) -> Result<LoadUserUserResult, String> {
-    let result = LoadUserUserResult::default();
     let result = sqlx::query!(r#"
         SELECT
         email,

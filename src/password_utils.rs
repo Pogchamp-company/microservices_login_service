@@ -6,9 +6,7 @@ use base64ct::{Base64, Encoding};
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
 use rocket::serde::json::serde_json;
-use serde::Serialize;
 use sha2::Digest;
-use sha2::digest;
 use sha2::Sha256;
 
 pub fn hash_password(password: &str) -> String {

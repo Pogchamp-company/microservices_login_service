@@ -17,3 +17,16 @@ Create .env file
 ```
 cargo run
 ```
+
+## Code guidelines
+
+### Use clippy
+#### Run clippy
+```
+cargo clippy -- -A clippy::needless_return
+```
+
+clippy::needless_return should be ignored.
+As omitted "return" in medium/large functions does not do anything good, but confuse people from other languages.
+
+Use clippy to catch all inconveniences
