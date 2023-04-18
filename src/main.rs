@@ -30,6 +30,10 @@ async fn rocket() -> _ {
         .max_connections(5)
         .connect(&db_uri).await.expect("Pool was not created");
 
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await.expect("Migrations failed");
+
     rocket::build()
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
