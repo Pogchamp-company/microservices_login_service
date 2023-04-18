@@ -2,7 +2,7 @@ use rocket::response::status;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use crate::models::user::load_user;
+use crate::models::user::{load_user, UserRole};
 use crate::password_utils::{create_jwt, hash_password};
 use crate::views::base::{ErrorJson, format_to_error_json};
 
@@ -15,6 +15,7 @@ pub struct LoginRequest {
 #[derive(Debug, Serialize)]
 pub struct LoginResponse {
     token: String,
+    roles: Vec<UserRole>
 }
 
 
@@ -37,5 +38,6 @@ pub async fn login(login_request: Json<LoginRequest>,
 
     Ok(Json(LoginResponse{
         token: create_jwt(&user.email),
+        roles: user.roles
     }))
 }
