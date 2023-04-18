@@ -2,6 +2,7 @@ use rocket::response::status;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use crate::models::user::{load_user, UserRole};
 
 use crate::password_utils::get_email_from_token;
 use crate::views::base::{ErrorJson, format_to_error_json};
@@ -14,22 +15,35 @@ pub struct AccessTokenRequest {
 #[derive(Debug, Serialize)]
 pub struct AccessTokenResponse {
     email: String,
+    roles: Vec<UserRole>
 }
 
 #[get("/check", format = "json", data = "<access_token_request>")]
 pub async fn check_access_token(access_token_request: Json<AccessTokenRequest>,
                             pool: &rocket::State<PgPool>)
                             -> Result<Json<AccessTokenResponse>, status::Unauthorized<ErrorJson>> {
+    let email = get_email_from_token(&access_token_request.token);
 
-    return match get_email_from_token(&access_token_request.token) {
-        Ok(email) => {
-            Ok(Json(AccessTokenResponse {
-                email
-                // todo Return user roles
-            }))
-        }
+    let email = match email {
+        Ok(email) => email,
+
         Err(error_message) => {
-            Err(status::Unauthorized(format_to_error_json(error_message)))
+            return Err(status::Unauthorized(format_to_error_json(error_message)));
         }
     };
+
+    let user = load_user(&email, pool).await;
+
+    let user = match user {
+        Ok(user) => user,
+
+        Err(error_message) => {
+            return Err(status::Unauthorized(format_to_error_json(error_message)));
+        }
+    };
+
+    return Ok(Json(AccessTokenResponse {
+        email,
+        roles: user.roles
+    }));
 }
