@@ -1,5 +1,5 @@
 -- Add up migration script here
-CREATE TYPE user_role AS ENUM ('TaskManager', 'HumanResources', 'director');
+CREATE TYPE user_role AS ENUM ('task_manager', 'human_resources', 'director');
 
 CREATE TABLE user_to_role (
     user_email varchar(100) not null,

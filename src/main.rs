@@ -10,6 +10,7 @@ use sqlx::postgres::PgPoolOptions;
 use views::check_access_token::check_access_token;
 use views::login::login;
 use views::register::register;
+use views::check_role::check_role;
 
 mod password_utils;
 mod models;
@@ -37,5 +38,5 @@ async fn rocket() -> _ {
     rocket::build()
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
-        .mount("/auth", routes![register, check_access_token, login])
+        .mount("/auth", routes![register, check_access_token, login, check_role])
 }

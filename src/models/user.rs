@@ -1,7 +1,7 @@
-use serde::Serialize;
-use sqlx::PgPool;
+use serde::{Deserialize, Serialize};
+use sqlx::{Error, PgPool};
 
-#[derive(sqlx::Type, Debug, Serialize)]
+#[derive(sqlx::Type, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "user_role", rename_all = "snake_case")]
 pub enum UserRole {
@@ -54,4 +54,23 @@ pub async fn load_user(email: &str, poll: &PgPool) -> Result<LoadUserUserResult,
             error => Err(format!("Непредвиденная ошибка: {}", error))
         }
     }
+}
+
+pub async fn check_user_role(email: &str, role: &UserRole, poll: &PgPool) -> bool {
+    let result = sqlx::query!(r#"
+        SELECT EXISTS(
+            SELECT user_email
+            FROM user_to_role
+            WHERE user_email = $1 AND role = $2
+        ) AS "has_role: bool"
+    "#, email, role as _).fetch_one(poll).await;
+
+    return match result {
+        Ok(record) => {
+            record.has_role.unwrap()
+        }
+        Err(..) => {
+            false
+        }
+    };
 }
