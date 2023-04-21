@@ -25,8 +25,8 @@ fn index() -> &'static str {
 }
 
 
-#[launch]
-async fn rocket() -> _ {
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
     dotenv().ok();
 
     let db_uri = env::var("DATABASE_URL").expect("DATABASE_URI not provided in .env");
@@ -42,4 +42,8 @@ async fn rocket() -> _ {
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
         .mount("/auth", routes![add_user, check_access_token, login, check_role, add_roles_view])
+        .ignite().await?
+        .launch().await?;
+
+    Ok(())
 }
