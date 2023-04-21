@@ -27,11 +27,11 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let tokens: Vec<_> = request.headers().get("x-user-token").collect();
         if tokens.len() == 0 {
-            return Outcome::Failure((Status::BadRequest, UserTokenError::Missing));
+            return Outcome::Failure((Status::Unauthorized, UserTokenError::Missing));
         }
 
         if tokens.len() > 1 {
-            return Outcome::Failure((Status::BadRequest, UserTokenError::BadCount));
+            return Outcome::Failure((Status::Unauthorized, UserTokenError::BadCount));
         }
 
         let token = tokens[0];

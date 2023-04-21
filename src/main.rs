@@ -11,6 +11,8 @@ use views::add_user::add_user;
 use views::check_access_token::check_access_token;
 use views::check_role::check_role;
 use views::login::login;
+use views::add_role::add_roles_view;
+
 
 mod password_utils;
 mod models;
@@ -39,5 +41,5 @@ async fn rocket() -> _ {
     rocket::build()
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
-        .mount("/auth", routes![add_user, check_access_token, login, check_role])
+        .mount("/auth", routes![add_user, check_access_token, login, check_role, add_roles_view])
 }
