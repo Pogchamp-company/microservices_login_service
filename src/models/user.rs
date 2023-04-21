@@ -1,6 +1,6 @@
-use sqlx::{PgPool};
-use crate::models::user_role::UserRole;
+use sqlx::PgPool;
 
+use crate::models::user_role::UserRole;
 
 pub async fn create_user(login: &str, password: &str, poll: &PgPool) -> Result<(), sqlx::Error> {
     let result = sqlx::query!(r#"

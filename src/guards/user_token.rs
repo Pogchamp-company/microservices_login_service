@@ -1,8 +1,9 @@
 use rocket::http::Status;
 use rocket::outcome::Outcome;
-use rocket::request::{self, Request, FromRequest};
+use rocket::request::{self, FromRequest, Request};
 use sqlx::PgPool;
-use crate::models::user::{load_user};
+
+use crate::models::user::load_user;
 use crate::models::user_role::UserRole;
 use crate::password_utils::get_email_from_token;
 

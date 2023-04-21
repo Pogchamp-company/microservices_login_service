@@ -3,7 +3,7 @@ use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::models::user::{load_user};
+use crate::models::user::load_user;
 use crate::models::user_role::UserRole;
 use crate::password_utils::{create_jwt, hash_password};
 use crate::views::base::{ErrorJson, format_to_error_json};

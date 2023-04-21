@@ -7,10 +7,10 @@ use dotenv::dotenv;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 
-use views::check_access_token::check_access_token;
-use views::login::login;
 use views::add_user::add_user;
+use views::check_access_token::check_access_token;
 use views::check_role::check_role;
+use views::login::login;
 
 mod password_utils;
 mod models;
