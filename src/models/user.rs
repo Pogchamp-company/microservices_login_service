@@ -1,14 +1,6 @@
-use serde::{Deserialize, Serialize};
-use sqlx::{Error, PgPool};
+use sqlx::{PgPool};
+use crate::models::user_role::UserRole;
 
-#[derive(sqlx::Type, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-#[sqlx(type_name = "user_role", rename_all = "snake_case")]
-pub enum UserRole {
-    TaskManager,
-    HumanResources,
-    Director
-}
 
 pub async fn create_user(login: &str, password: &str, poll: &PgPool) -> Result<(), sqlx::Error> {
     let result = sqlx::query!(r#"
