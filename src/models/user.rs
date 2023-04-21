@@ -1,13 +1,21 @@
-use sqlx::PgPool;
+use sqlx::{Error, PgPool};
 
 use crate::models::user_role::UserRole;
 
-pub async fn create_user(login: &str, password: &str, poll: &PgPool) -> Result<(), sqlx::Error> {
+pub async fn create_user(login: &str, password: &str, poll: &PgPool) -> Result<(), String> {
     let result = sqlx::query!(r#"
         INSERT INTO "user" VALUES ($1, $2)
     "#, login, password)
-        .execute(poll).await?;
-    Ok(())
+        .execute(poll).await;
+    return match result {
+        Ok(_) => {
+            Ok(())
+        }
+        Err(error) => match error {
+            Error::Database(..) => Err("Введённый email уже существует".to_string()),
+            error => Err(format!("Непредвиденная ошибка: {}", error))
+        }
+    };
 }
 
 #[derive(Default)]

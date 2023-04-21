@@ -35,8 +35,8 @@ pub async fn add_user(add_user_request: Json<AddUserRequest>,
     let hashed_password = password_utils::hash_password(&add_user_request.password);
     let query_result = models::user::create_user(&add_user_request.login.clone(), &hashed_password, pool).await;
 
-    if let Err(..) = query_result {
-        return Err(status::Custom(Status::Conflict, format_to_error_json("Введённый email уже существует".to_string()).unwrap()));
+    if let Err(error_message) = query_result {
+        return Err(status::Custom(Status::Conflict, format_to_error_json(error_message).unwrap()));
     }
 
     add_roles(&add_user_request.login, &add_user_request.roles, pool).await;

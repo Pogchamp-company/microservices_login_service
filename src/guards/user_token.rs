@@ -26,7 +26,7 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let tokens: Vec<_> = request.headers().get("x-user-token").collect();
-        if tokens.len() == 0 {
+        if tokens.is_empty() {
             return Outcome::Failure((Status::Unauthorized, UserTokenError::Missing));
         }
 

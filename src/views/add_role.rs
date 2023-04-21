@@ -4,7 +4,6 @@ use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{models, password_utils};
 use crate::guards::user_token::UserTokenInfo;
 use crate::models::user::load_user;
 use crate::models::user_role::{add_roles, UserRole};

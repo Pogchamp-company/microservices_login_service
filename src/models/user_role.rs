@@ -39,9 +39,9 @@ pub fn has_permission_to_add_roles(user: &UserTokenInfo, roles: &Vec<UserRole>) 
     return true;
 }
 
-pub async fn add_roles(user_email: &str, roles: &Vec<UserRole>, pool: &PgPool) {
+pub async fn add_roles(user_email: &str, roles: &[UserRole], pool: &PgPool) {
     let roles = roles.to_vec();
     sqlx::query!(r#"
         INSERT INTO user_to_role(user_email, role) SELECT $1, unnest($2::user_role[]) ON CONFLICT DO NOTHING;
-    "#, user_email, roles as Vec<UserRole>).execute(pool).await.expect(&*format!("Can not add roles to user {}", user_email));
+    "#, user_email, roles as Vec<UserRole>).execute(pool).await.expect(&format!("Can not add roles to user {}", user_email));
 }
