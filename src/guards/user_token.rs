@@ -1,12 +1,16 @@
 use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::{self, FromRequest, Request};
+use rocket_okapi::gen::OpenApiGenerator;
+use rocket_okapi::okapi::openapi3::{Object, SecurityRequirement, SecurityScheme, SecuritySchemeData};
+use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 use sqlx::PgPool;
 
 use crate::models::user::load_user;
 use crate::models::user_role::UserRole;
 use crate::password_utils::get_email_from_token;
 
+#[derive()]
 pub struct UserTokenInfo {
     pub email: String,
     pub roles: Vec<UserRole>,
@@ -62,5 +66,30 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
             email,
             roles: user.roles,
         });
+    }
+}
+
+impl OpenApiFromRequest<'_> for UserTokenInfo {
+    fn from_request_input(
+        _gen: &mut OpenApiGenerator,
+        _name: String,
+        _required: bool,
+    ) -> rocket_okapi::Result<RequestHeaderInput> {
+        let security_scheme = SecurityScheme {
+            description: Some("Requires an User Token to access.".to_owned()),
+            data: SecuritySchemeData::ApiKey {
+                name: "x-user-token".to_owned(),
+                location: "header".to_owned(),
+            },
+            extensions: Object::default(),
+        };
+        let mut security_req = SecurityRequirement::new();
+        security_req.insert("UserTokenAuth".to_owned(), Vec::new());
+
+        Ok(RequestHeaderInput::Security(
+            "UserTokenAuth".to_owned(),
+            security_scheme,
+            security_req,
+        ))
     }
 }

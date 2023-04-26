@@ -10,7 +10,9 @@ base64ct = {version = "1.6.0", features=["alloc"]}
 dotenv = "0.15.0"
 hmac = "0.12.1"
 jwt = "0.16.0"
-rocket = { version = "=0.5.0-rc.3", features = ["json"] }
+rocket = { version = "=0.5.0-rc.2", features = ["json"] }
+rocket_okapi = { version="0.8.0-rc.2", features = ["swagger"] }
+schemars = "0.8.12"
 serde = { version = "1.0", features = ["derive"] }
 sha2 = "0.10.6"
 sqlx = { version = "0.6.3", features = [ "runtime-async-std-rustls", "postgres" ] }

@@ -1,6 +1,8 @@
 use rocket::http::Status;
 use rocket::response::status;
 use rocket::serde::json::Json;
+use rocket_okapi::{openapi};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -10,18 +12,19 @@ use crate::models::user_role::{add_roles, UserRole};
 use crate::models::user_role::has_permission_to_add_roles;
 use crate::views::base::{ErrorJson, format_to_error_json};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct AddUserRequest {
     login: String,
     password: String,
     roles: Vec<UserRole>
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 pub struct AddUserResponse {
     token: String,
 }
 
+#[openapi]
 #[post("/add_user", format = "json", data = "<add_user_request>")]
 pub async fn add_user(add_user_request: Json<AddUserRequest>,
                       pool: &rocket::State<PgPool>,

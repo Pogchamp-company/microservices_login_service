@@ -1,5 +1,7 @@
 use rocket::response::status::Unauthorized;
 use rocket::serde::json::Json;
+use rocket_okapi::openapi;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -8,17 +10,18 @@ use crate::models::user_role::UserRole;
 use crate::password_utils::get_email_from_token;
 use crate::views::base::{ErrorJson, format_to_error_json};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct CheckRoleRequest {
     token: String,
     role: UserRole,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 pub struct CheckRoleResponse {
     has_access: bool,
 }
 
+#[openapi]
 #[get("/check_role", format = "json", data = "<check_role_request>")]
 pub async fn check_role(check_role_request: Json<CheckRoleRequest>,
                         pool: &rocket::State<PgPool>) -> Result<Json<CheckRoleResponse>, Unauthorized<ErrorJson>> {

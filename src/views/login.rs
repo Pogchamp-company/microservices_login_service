@@ -1,5 +1,7 @@
 use rocket::response::status;
 use rocket::serde::json::Json;
+use rocket_okapi::openapi;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -8,19 +10,19 @@ use crate::models::user_role::UserRole;
 use crate::password_utils::{create_jwt, hash_password};
 use crate::views::base::{ErrorJson, format_to_error_json};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct LoginRequest {
     login: String,
     password: String
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 pub struct LoginResponse {
     token: String,
     roles: Vec<UserRole>
 }
 
-
+#[openapi]
 #[get("/login", format = "json", data = "<login_request>")]
 pub async fn login(login_request: Json<LoginRequest>,
                    pool: &rocket::State<PgPool>) -> Result<Json<LoginResponse>, status::Forbidden<ErrorJson>> {

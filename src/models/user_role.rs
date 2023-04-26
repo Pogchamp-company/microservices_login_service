@@ -1,10 +1,11 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use sqlx::postgres::{PgHasArrayType, PgTypeInfo};
 
 use crate::guards::user_token::UserTokenInfo;
 
-#[derive(sqlx::Type, Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(sqlx::Type, Debug, Serialize, Deserialize, PartialEq, Clone, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "user_role", rename_all = "snake_case")]
 pub enum UserRole {

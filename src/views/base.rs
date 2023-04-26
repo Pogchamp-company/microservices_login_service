@@ -1,7 +1,8 @@
 use rocket::serde::json::Json;
+use schemars::JsonSchema;
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 pub struct ErrorJsonFormat {
     pub detail: String,
 }
