@@ -21,8 +21,8 @@ use crate::views::check_role::okapi_add_operation_for_check_role_;
 use views::login::login;
 use crate::views::login::okapi_add_operation_for_login_;
 
-use views::add_role::add_roles_view;
-use crate::views::add_role::okapi_add_operation_for_add_roles_view_;
+use views::add_roles::add_roles_view;
+use crate::views::add_roles::okapi_add_operation_for_add_roles_view_;
 
 
 

@@ -20,7 +20,7 @@ pub fn hash_password(password: &str) -> String {
 }
 
 
-pub fn create_jwt(login: &str) -> String {
+pub fn create_jwt(email: &str) -> String {
     let salt = env::var("JWT_SALT").unwrap_or("default_salt".to_string());
 
     let hours_to_expire = 12;
@@ -29,7 +29,7 @@ pub fn create_jwt(login: &str) -> String {
 
     let key: Hmac<Sha256> = Hmac::new_from_slice(salt.as_bytes()).expect("Hmac issue");
     let mut claims: BTreeMap<&str, String> = BTreeMap::new();
-    claims.insert("sub", login.to_string());
+    claims.insert("sub", email.to_string());
     claims.insert("expire", serde_json::to_string(&(now + expire_time)).expect("Serde issue"));
     let token_str = claims.sign_with_key(&key).expect("Sign issue");
 

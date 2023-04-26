@@ -12,7 +12,7 @@ use crate::views::base::{ErrorJson, format_to_error_json};
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct LoginRequest {
-    login: String,
+    email: String,
     password: String
 }
 
@@ -26,7 +26,7 @@ pub struct LoginResponse {
 #[get("/login", format = "json", data = "<login_request>")]
 pub async fn login(login_request: Json<LoginRequest>,
                    pool: &rocket::State<PgPool>) -> Result<Json<LoginResponse>, status::Forbidden<ErrorJson>> {
-    let user = load_user(&login_request.login, pool).await;
+    let user = load_user(&login_request.email, pool).await;
 
     let user = match user {
         Ok(user) => user,

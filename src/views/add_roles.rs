@@ -14,7 +14,7 @@ use crate::views::base::{ErrorJson, format_to_error_json};
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct AddRolesRequest {
-    login: String,
+    email: String,
     roles: Vec<UserRole>
 }
 
@@ -34,13 +34,13 @@ pub async fn add_roles_view(add_roles_request: Json<AddRolesRequest>,
         ).unwrap()))
     }
 
-    let user = load_user(&add_roles_request.login, pool).await;
+    let user = load_user(&add_roles_request.email, pool).await;
 
     if let Err(error_message) = user {
         return Err(status::Custom(Status::BadRequest, format_to_error_json(error_message).unwrap()));
     }
 
-    add_roles(&add_roles_request.login, &add_roles_request.roles, pool).await;
+    add_roles(&add_roles_request.email, &add_roles_request.roles, pool).await;
 
     return Ok(Json(AddRolesResponse {
         ok: true

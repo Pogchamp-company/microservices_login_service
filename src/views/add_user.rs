@@ -14,7 +14,7 @@ use crate::views::base::{ErrorJson, format_to_error_json};
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct AddUserRequest {
-    login: String,
+    email: String,
     password: String,
     roles: Vec<UserRole>
 }
@@ -36,15 +36,15 @@ pub async fn add_user(add_user_request: Json<AddUserRequest>,
     }
 
     let hashed_password = password_utils::hash_password(&add_user_request.password);
-    let query_result = models::user::create_user(&add_user_request.login.clone(), &hashed_password, pool).await;
+    let query_result = models::user::create_user(&add_user_request.email.clone(), &hashed_password, pool).await;
 
     if let Err(error_message) = query_result {
         return Err(status::Custom(Status::Conflict, format_to_error_json(error_message).unwrap()));
     }
 
-    add_roles(&add_user_request.login, &add_user_request.roles, pool).await;
+    add_roles(&add_user_request.email, &add_user_request.roles, pool).await;
 
     return Ok(Json(AddUserResponse {
-        token: password_utils::create_jwt(&add_user_request.login)
+        token: password_utils::create_jwt(&add_user_request.email)
     }));
 }
