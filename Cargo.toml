@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+amqp_serde = "0.3.0"
+amqprs = { version = "1.2.1", features = ["urispec"] }
 base64ct = {version = "1.6.0", features=["alloc"]}
 dotenv = "0.15.0"
 hmac = "0.12.1"
