@@ -29,6 +29,14 @@ pub async fn handle_create_director(mut args: Vec<String>) -> Result<(), String>
     return Err("Email and password are required".to_string());
 }
 
+pub fn print_help() {
+    println!("Login service written in Rust");
+    println!();
+    println!("Commands:");
+    println!("create_director <email> <password>");
+    println!();
+}
+
 pub async fn handle_console_command() -> Result<bool, String> {
     let mut args: Vec<String> = env::args().rev().collect();
 
@@ -36,10 +44,19 @@ pub async fn handle_console_command() -> Result<bool, String> {
     let query = args.pop();
 
     if let Some(query) = query {
-        if query == "create_director" {
-            handle_create_director(args).await?;
+        match query.as_str() {
+            "create_director" => {
+                handle_create_director(args).await?;
+            },
+            "help" | "--help" | "-h" => {
+                print_help();
+            }
+            _ => {
+                print_help();
+                return Err(format!("Invalid command: {}", query));
+            }
         }
-        return Err(format!("Invalid command: {}", query));
+        return Ok(true);
     }
-    return Ok(false)
+    return Ok(false);
 }
