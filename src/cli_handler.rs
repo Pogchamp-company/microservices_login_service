@@ -1,5 +1,7 @@
 use std::env;
+
 use sqlx::postgres::PgPoolOptions;
+
 use crate::models::user::create_user;
 use crate::models::user_role::{add_roles, UserRole};
 

@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use sqlx::PgPool;
+
 use crate::consumers::RabbitMQConsumer;
 use crate::models::user::create_user;
 use crate::models::user_role::UserRole;

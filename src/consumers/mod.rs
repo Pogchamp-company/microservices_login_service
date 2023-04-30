@@ -1,10 +1,10 @@
-use std::str::Utf8Error;
 use amqp_serde::types::{FieldName, FieldTable, FieldValue};
 use amqprs::{BasicProperties, Deliver};
 use amqprs::channel::Channel;
 use amqprs::consumer::AsyncConsumer;
 use rocket::serde::json::serde_json;
 use sqlx::PgPool;
+
 use crate::consumers::create_user::CreateUserSchema;
 use crate::consumers::delete_user::DeleteUserSchema;
 

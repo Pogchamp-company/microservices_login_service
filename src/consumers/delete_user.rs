@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use sqlx::PgPool;
+
 use crate::consumers::create_user::CreateUserSchema;
 
 #[derive(Deserialize, Debug)]

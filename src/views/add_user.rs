@@ -1,7 +1,7 @@
 use rocket::http::Status;
 use rocket::response::status;
 use rocket::serde::json::Json;
-use rocket_okapi::{openapi};
+use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
