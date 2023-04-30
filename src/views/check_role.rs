@@ -4,38 +4,26 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 
 use crate::models::user::check_user_role;
 use crate::models::user_role::UserRole;
 use crate::password_utils::get_email_from_token;
 use crate::views::base::{ErrorJson, format_to_error_json};
 
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct CheckRoleRequest {
-    token: String,
-    role: UserRole,
-}
-
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct CheckRoleResponse {
     has_access: bool,
 }
 
+/// # Check that you have provided role
 #[openapi]
-#[get("/check_role", format = "json", data = "<check_role_request>")]
-pub async fn check_role(check_role_request: Json<CheckRoleRequest>,
+#[get("/check_role/<role>")]
+pub async fn check_role(role: UserRole,
+                        current_user: Result<UserTokenInfo, UserTokenError>,
                         pool: &rocket::State<PgPool>) -> Result<Json<CheckRoleResponse>, Unauthorized<ErrorJson>> {
-    let email = get_email_from_token(&check_role_request.token);
-
-    let email = match email {
-        Ok(email) => email,
-
-        Err(error_message) => {
-            return Err(Unauthorized(format_to_error_json(error_message)));
-        }
-    };
-
-    let user_has_role = check_user_role(&email, &check_role_request.role, pool).await;
+    let current_user = current_user?;
+    let user_has_role = check_user_role(&current_user.email, &role, pool).await;
 
     return if user_has_role {
         Ok(Json(CheckRoleResponse {

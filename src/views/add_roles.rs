@@ -6,7 +6,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::guards::user_token::UserTokenInfo;
+use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 use crate::models::user::load_user;
 use crate::models::user_role::{add_roles, UserRole};
 use crate::models::user_role::has_permission_to_add_roles;
@@ -23,11 +23,15 @@ pub struct AddRolesResponse {
     ok: bool,
 }
 
+/// # Add roles to user
+/// You must have permission to add specified roles
 #[openapi]
 #[post("/add_roles", format = "json", data = "<add_roles_request>")]
 pub async fn add_roles_view(add_roles_request: Json<AddRolesRequest>,
                       pool: &rocket::State<PgPool>,
-                      current_user: UserTokenInfo) -> Result<Json<AddRolesResponse>, status::Custom<ErrorJson>> {
+                      current_user: Result<UserTokenInfo, UserTokenError>) -> Result<Json<AddRolesResponse>, status::Custom<ErrorJson>> {
+    let current_user = current_user?;
+
     if !has_permission_to_add_roles(&current_user, &add_roles_request.roles) {
         return Err(status::Custom(Status::Forbidden, format_to_error_json(
             "Вам недостаточно прав на создание пользователя с такими ролями".to_string()

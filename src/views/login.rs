@@ -22,6 +22,7 @@ pub struct LoginResponse {
     roles: Vec<UserRole>
 }
 
+/// # Log in and get token
 #[openapi]
 #[get("/login", format = "json", data = "<login_request>")]
 pub async fn login(login_request: Json<LoginRequest>,

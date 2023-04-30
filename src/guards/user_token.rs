@@ -1,9 +1,11 @@
 use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::{self, FromRequest, Request};
+use rocket::serde::Deserialize;
 use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::okapi::openapi3::{Object, SecurityRequirement, SecurityScheme, SecuritySchemeData};
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
+use serde::Serialize;
 use sqlx::PgPool;
 
 use crate::models::user::load_user;
@@ -16,7 +18,8 @@ pub struct UserTokenInfo {
     pub roles: Vec<UserRole>,
 }
 
-#[derive(Debug)]
+
+#[derive(Debug, Serialize)]
 pub enum UserTokenError {
     Missing,
     BadCount,

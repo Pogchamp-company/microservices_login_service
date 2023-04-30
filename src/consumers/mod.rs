@@ -25,7 +25,7 @@ impl RabbitMQConsumer {
 
 #[async_trait]
 impl AsyncConsumer for RabbitMQConsumer {
-    async fn consume(&mut self, channel: &Channel, deliver: Deliver, basic_properties: BasicProperties, content: Vec<u8>) {
+    async fn consume(&mut self, _channel: &Channel, _deliver: Deliver, basic_properties: BasicProperties, content: Vec<u8>) {
         let raw_string = match std::str::from_utf8(&content) {
             Ok(raw_string) => raw_string,
             Err(..) => {

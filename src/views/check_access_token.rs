@@ -4,6 +4,7 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 
 use crate::models::user::load_user;
 use crate::models::user_role::UserRole;
@@ -21,33 +22,14 @@ pub struct AccessTokenResponse {
     roles: Vec<UserRole>
 }
 
+/// # Check that provided token is valid and return all user roles
 #[openapi]
-#[get("/check", format = "json", data = "<access_token_request>")]
-pub async fn check_access_token(access_token_request: Json<AccessTokenRequest>,
-                            pool: &rocket::State<PgPool>)
+#[get("/check")]
+pub async fn check_access_token(current_user: Result<UserTokenInfo, UserTokenError>)
                             -> Result<Json<AccessTokenResponse>, status::Unauthorized<ErrorJson>> {
-    let email = get_email_from_token(&access_token_request.token);
-
-    let email = match email {
-        Ok(email) => email,
-
-        Err(error_message) => {
-            return Err(status::Unauthorized(format_to_error_json(error_message)));
-        }
-    };
-
-    let user = load_user(&email, pool).await;
-
-    let user = match user {
-        Ok(user) => user,
-
-        Err(error_message) => {
-            return Err(status::Unauthorized(format_to_error_json(error_message)));
-        }
-    };
-
+    let current_user = current_user?;
     return Ok(Json(AccessTokenResponse {
-        email,
-        roles: user.roles
+        email: current_user.email,
+        roles: current_user.roles
     }));
 }
