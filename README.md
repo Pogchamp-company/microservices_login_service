@@ -13,6 +13,7 @@ Create .env file
 | DATABASE_URL  | postgresql://username:password@localhost:5432/login_service |
 | SECURITY_SALT | kjdjkhnsdkjfhsjkdhkjasdhkjdshf                              |
 | JWT_SALT      | sddladkjsdfkjsdlfjsdfj                                      |
+| RABBITMQ_URI  | amqp://guest:guest@localhost:5672/                          |
 
 ```
 cargo run
