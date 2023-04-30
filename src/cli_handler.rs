@@ -19,7 +19,7 @@ pub async fn handle_create_director(mut args: Vec<String>) -> Result<(), String>
             .run(&pool)
             .await.expect("Migrations failed");
 
-        create_user(&admin_email, &admin_password, &pool).await?;
+        create_user(&admin_email, &admin_password, 0, &pool).await?;
         add_roles(&admin_email, &[UserRole::Director], &pool).await;
 
         println!("Admin created successfully!");

@@ -3,7 +3,7 @@ use sqlx::PgPool;
 
 use crate::consumers::RabbitMQConsumer;
 use crate::models::user::create_user;
-use crate::models::user_role::UserRole;
+use crate::models::user_role::{add_roles, UserRole};
 
 #[derive(Deserialize, Debug)]
 pub struct CreateUserSchema {
@@ -14,6 +14,7 @@ pub struct CreateUserSchema {
 }
 
 pub async fn consume(request: CreateUserSchema, database_connection: &PgPool) -> Result<(), String> {
-    create_user(&request.email, &request.password, database_connection).await?;
+    create_user(&request.email, &request.password, request.employee_id, database_connection).await?;
+    add_roles(&request.password, &request.roles, database_connection).await;
     Ok(())
 }
