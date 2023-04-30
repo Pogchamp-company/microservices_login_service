@@ -9,8 +9,6 @@ use sqlx::postgres::PgPoolOptions;
 
 use crate::views::add_roles::add_roles_view;
 use crate::views::add_roles::okapi_add_operation_for_add_roles_view_;
-use crate::views::add_user::add_user;
-use crate::views::add_user::okapi_add_operation_for_add_user_;
 use crate::views::check_access_token::check_access_token;
 use crate::views::check_access_token::okapi_add_operation_for_check_access_token_;
 use crate::views::check_role::check_role;
@@ -32,7 +30,7 @@ pub async fn rocket_main() -> Result<(), rocket::Error> {
     let _ = rocket::build()
         .manage::<PgPool>(pool)
         .mount("/", routes![index])
-        .mount("/auth", openapi_get_routes![add_user, check_access_token, login, check_role, add_roles_view])
+        .mount("/auth", openapi_get_routes![check_access_token, login, check_role, add_roles_view])
         .mount(
             "/docs/",
             make_swagger_ui(&SwaggerUIConfig {
