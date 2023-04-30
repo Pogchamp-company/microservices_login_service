@@ -18,6 +18,11 @@ Create .env file
 cargo run
 ```
 
+Create director
+```
+cargo run create_director director@pogchamp.ru qwerty
+```
+
 ## Code guidelines
 
 ### Use clippy

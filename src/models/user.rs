@@ -1,11 +1,14 @@
 use sqlx::{Error, PgPool};
 
 use crate::models::user_role::UserRole;
+use crate::password_utils;
 
 pub async fn create_user(email: &str, password: &str, poll: &PgPool) -> Result<(), String> {
+    let hashed_password = password_utils::hash_password(password);
+
     let result = sqlx::query!(r#"
         INSERT INTO "user" VALUES ($1, $2)
-    "#, email, password)
+    "#, email, hashed_password)
         .execute(poll).await;
     return match result {
         Ok(_) => {
