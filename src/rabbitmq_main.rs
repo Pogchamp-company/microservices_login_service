@@ -3,6 +3,8 @@ use std::env;
 use amqprs::callbacks::{DefaultChannelCallback, DefaultConnectionCallback};
 use amqprs::channel::{BasicConsumeArguments, QueueBindArguments, QueueDeclareArguments};
 use amqprs::connection::{Connection, OpenConnectionArguments};
+use amqprs::consumer::DefaultConsumer;
+use rocket::tokio::sync::Notify;
 use sqlx::postgres::PgPoolOptions;
 
 use crate::consumers::RabbitMQConsumer;
@@ -32,36 +34,29 @@ pub async fn rabbit_main() -> Result<(), String> {
         .await
         .unwrap();
 
+    let routing_key = "auth".to_string();
+
     // declare a queue
     let (queue_name, _, _) = channel
-        .queue_declare(QueueDeclareArguments::default())
+        .queue_declare(QueueDeclareArguments::default().queue(routing_key).finish())
         .await
         .unwrap()
-        .unwrap();
-
-    // bind the queue to exchange
-    let rounting_key = "amqprs.example";
-    let exchange_name = "amq.topic";
-    channel
-        .queue_bind(QueueBindArguments::new(
-            &queue_name,
-            exchange_name,
-            rounting_key,
-        ))
-        .await
         .unwrap();
 
     //////////////////////////////////////////////////////////////////
     // start consumer with given name
     let args = BasicConsumeArguments::new(
         &queue_name,
-        "example_basic_pub_sub"
+        ""
     );
 
     channel
         .basic_consume(RabbitMQConsumer::new(pool), args)
         .await
         .unwrap();
+
+    let guard = Notify::new();
+    guard.notified().await;
 
     Ok(())
 }

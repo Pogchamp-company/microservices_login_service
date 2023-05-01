@@ -1,6 +1,6 @@
 use amqp_serde::types::{FieldName, FieldValue};
 use amqprs::{BasicProperties, Deliver};
-use amqprs::channel::Channel;
+use amqprs::channel::{BasicAckArguments, Channel};
 use amqprs::consumer::AsyncConsumer;
 use rocket::serde::json::serde_json;
 use sqlx::PgPool;
@@ -25,7 +25,10 @@ impl RabbitMQConsumer {
 
 #[async_trait]
 impl AsyncConsumer for RabbitMQConsumer {
-    async fn consume(&mut self, _channel: &Channel, _deliver: Deliver, basic_properties: BasicProperties, content: Vec<u8>) {
+    async fn consume(&mut self, channel: &Channel, deliver: Deliver, basic_properties: BasicProperties, content: Vec<u8>) {
+        channel.basic_ack(BasicAckArguments::new(deliver.delivery_tag(), false)).await
+            .expect("Could not send acknowledgement!");
+
         let raw_string = match std::str::from_utf8(&content) {
             Ok(raw_string) => raw_string,
             Err(..) => {
