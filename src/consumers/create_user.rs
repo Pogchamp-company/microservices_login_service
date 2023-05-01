@@ -14,7 +14,7 @@ pub struct CreateUserSchema {
 
 pub async fn consume(request: CreateUserSchema, database_connection: &PgPool) -> Result<String, String> {
     create_user(&request.email, &request.password, request.employee_id, database_connection).await?;
-    add_roles(&request.password, &request.roles, database_connection).await?;
+    add_roles(&request.email, &request.roles, database_connection).await?;
 
     Ok(format!("User {} created successfully with roles: {:?}", request.email, request.roles))
 }
