@@ -24,6 +24,8 @@ Create director
 cargo run create_director director@pogchamp.ru qwerty
 ```
 
+To change address, port, log_level edit Rocket.toml file
+
 ## Code guidelines
 
 ### Use clippy
