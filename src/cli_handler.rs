@@ -5,7 +5,7 @@ use sqlx::postgres::PgPoolOptions;
 use crate::models::user::create_user;
 use crate::models::user_role::{add_roles, UserRole};
 
-pub async fn handle_create_director(mut args: Vec<String>) -> Result<(), String> {
+pub async fn handle_create_director(mut args: Vec<String>) -> Result<String, String> {
     let admin_email = args.pop();
     let admin_password = args.pop();
 
@@ -20,10 +20,9 @@ pub async fn handle_create_director(mut args: Vec<String>) -> Result<(), String>
             .await.expect("Migrations failed");
 
         create_user(&admin_email, &admin_password, 0, &pool).await?;
-        add_roles(&admin_email, &[UserRole::Director], &pool).await;
+        add_roles(&admin_email, &[UserRole::Director], &pool).await?;
 
-        println!("Admin created successfully!");
-        return Ok(());
+        return Ok("Admin created successfully!".to_string());
     }
 
     return Err("Email and password are required".to_string());
@@ -44,16 +43,25 @@ pub async fn handle_console_command() -> Result<bool, String> {
     let query = args.pop();
 
     if let Some(query) = query {
-        match query.as_str() {
+        let result = match query.as_str() {
             "create_director" => {
-                handle_create_director(args).await?;
+                handle_create_director(args).await
             },
             "help" | "--help" | "-h" => {
                 print_help();
+                return Ok(true);
             }
             _ => {
                 print_help();
                 return Err(format!("Invalid command: {}", query));
+            }
+        };
+        match result {
+            Ok(success_message) => {
+                println!("{}", success_message);
+            }
+            Err(error_message) => {
+                eprintln!("{}", error_message);
             }
         }
         return Ok(true);

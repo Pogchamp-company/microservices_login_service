@@ -14,7 +14,7 @@ pub async fn rabbit_main() -> Result<(), String> {
 
     let connection = Connection::open(&connection_arguments)
         .await
-        .unwrap();
+        .expect("Connection to RabbitMQ failed");
     connection
         .register_callback(DefaultConnectionCallback)
         .await

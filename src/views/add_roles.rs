@@ -44,7 +44,11 @@ pub async fn add_roles_view(add_roles_request: Json<AddRolesRequest>,
         return Err(status::Custom(Status::BadRequest, format_to_error_json(error_message).unwrap()));
     }
 
-    add_roles(&add_roles_request.email, &add_roles_request.roles, pool).await;
+    add_roles(&add_roles_request.email, &add_roles_request.roles, pool)
+        .await
+        .map_err(|error_message| {
+            status::Custom(Status::InternalServerError, format_to_error_json(error_message).unwrap())
+        })?;
 
     return Ok(Json(AddRolesResponse {
         ok: true
