@@ -1,14 +1,11 @@
 use std::env;
 
-use amqp_serde::types::{FieldName, FieldTable, FieldValue};
-use amqprs::BasicProperties;
 use amqprs::callbacks::{DefaultChannelCallback, DefaultConnectionCallback};
-use amqprs::channel::{BasicConsumeArguments, BasicPublishArguments, QueueBindArguments, QueueDeclareArguments};
+use amqprs::channel::{BasicConsumeArguments, QueueBindArguments, QueueDeclareArguments};
 use amqprs::connection::{Connection, OpenConnectionArguments};
 use sqlx::postgres::PgPoolOptions;
 
 use crate::consumers::RabbitMQConsumer;
-use crate::tokio::time;
 
 pub async fn rabbit_main() -> Result<(), String> {
     let addr = env::var("RABBITMQ_URI").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());

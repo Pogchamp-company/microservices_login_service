@@ -1,12 +1,11 @@
 use rocket::http::Status;
-use rocket::request;
-use rocket::request::Outcome;
 use rocket::response::status::{Custom, Unauthorized};
 use rocket::serde::json::Json;
+use rocket::serde::json::serde_json;
 use schemars::JsonSchema;
 use serde::Serialize;
-use crate::guards::user_token::{UserTokenError, UserTokenInfo};
-use rocket::serde::json::serde_json;
+
+use crate::guards::user_token::UserTokenError;
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct ErrorJsonFormat {

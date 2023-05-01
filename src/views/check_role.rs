@@ -2,13 +2,12 @@ use rocket::response::status::Unauthorized;
 use rocket::serde::json::Json;
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::PgPool;
-use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 
+use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 use crate::models::user::check_user_role;
 use crate::models::user_role::UserRole;
-use crate::password_utils::get_email_from_token;
 use crate::views::base::{ErrorJson, format_to_error_json};
 
 #[derive(Debug, Serialize, JsonSchema)]

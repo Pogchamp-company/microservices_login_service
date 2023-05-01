@@ -1,4 +1,4 @@
-use amqp_serde::types::{FieldName, FieldTable, FieldValue};
+use amqp_serde::types::{FieldName, FieldValue};
 use amqprs::{BasicProperties, Deliver};
 use amqprs::channel::Channel;
 use amqprs::consumer::AsyncConsumer;
@@ -81,7 +81,7 @@ impl AsyncConsumer for RabbitMQConsumer {
 
                 delete_user::consume(json, &self.database_connection).await
             },
-            (unknown_command) => Err(format!("Unknown command: {}", unknown_command))
+            unknown_command => Err(format!("Unknown command: {}", unknown_command))
         };
 
         match result {

@@ -3,8 +3,6 @@ extern crate rocket;
 
 use dotenv::dotenv;
 use rocket::tokio;
-use rocket_okapi::openapi_get_routes;
-use sqlx::PgPool;
 
 pub mod views;
 pub mod password_utils;

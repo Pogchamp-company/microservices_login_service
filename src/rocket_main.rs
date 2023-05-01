@@ -1,8 +1,6 @@
 use std::env;
 
-use dotenv::dotenv;
-use rocket::{Config, Request, routes};
-use rocket::http::Status;
+use rocket::routes;
 use rocket_okapi::openapi_get_routes;
 use rocket_okapi::swagger_ui::{make_swagger_ui, SwaggerUIConfig};
 use sqlx::PgPool;
