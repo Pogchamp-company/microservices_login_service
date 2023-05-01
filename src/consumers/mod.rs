@@ -58,7 +58,7 @@ impl AsyncConsumer for RabbitMQConsumer {
             }
         };
 
-        let result = match command.as_str() {
+        let result: Result<String, String> = match command.as_str() {
             "create_user" => {
                 let json: CreateUserSchema = match serde_json::from_str(raw_string) {
                     Ok(raw_string) => raw_string,
@@ -84,8 +84,13 @@ impl AsyncConsumer for RabbitMQConsumer {
             (unknown_command) => Err(format!("Unknown command: {}", unknown_command))
         };
 
-        if let Err(error_message) = result {
-            println!("Error during invocation of consume '{}'", error_message);
+        match result {
+            Ok(success_message) => {
+                println!("{}", success_message);
+            }
+            Err(error_message) => {
+                eprintln!("{}", error_message);
+            }
         }
     }
 }
