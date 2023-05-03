@@ -24,7 +24,7 @@ pub struct LoginResponse {
 
 /// # Log in and get token
 #[openapi]
-#[get("/login", format = "json", data = "<login_request>")]
+#[post("/login", format = "json", data = "<login_request>")]
 pub async fn login(login_request: Json<LoginRequest>,
                    pool: &rocket::State<PgPool>) -> Result<Json<LoginResponse>, status::Forbidden<ErrorJson>> {
     let user = load_user(&login_request.email, pool).await;

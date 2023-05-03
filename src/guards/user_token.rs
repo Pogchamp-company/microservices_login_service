@@ -31,7 +31,7 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
     type Error = UserTokenError;
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        let tokens: Vec<_> = request.headers().get("x-user-token").collect();
+        let tokens: Vec<_> = request.headers().get("Authorization").collect();
         if tokens.is_empty() {
             return Outcome::Failure((Status::Unauthorized, UserTokenError::Missing));
         }
@@ -80,7 +80,7 @@ impl OpenApiFromRequest<'_> for UserTokenInfo {
         let security_scheme = SecurityScheme {
             description: Some("Requires an User Token to access.".to_owned()),
             data: SecuritySchemeData::ApiKey {
-                name: "x-user-token".to_owned(),
+                name: "Authorization".to_owned(),
                 location: "header".to_owned(),
             },
             extensions: Object::default(),
