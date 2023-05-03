@@ -1,3 +1,4 @@
+use std::time::SystemTime;
 use amqp_serde::types::{FieldName, FieldValue};
 use amqprs::{BasicProperties, Deliver};
 use amqprs::channel::{BasicAckArguments, Channel};
@@ -89,10 +90,10 @@ impl AsyncConsumer for RabbitMQConsumer {
 
         match result {
             Ok(success_message) => {
-                println!("{}", success_message);
+                println!("[{:?} RABBITMQ INFO] {}", chrono::Utc::now(), success_message);
             }
             Err(error_message) => {
-                eprintln!("{}", error_message);
+                eprintln!("[{:?} RABBITMQ ERROR] {}", chrono::Utc::now(), error_message);
             }
         }
     }

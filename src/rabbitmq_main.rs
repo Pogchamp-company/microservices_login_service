@@ -4,7 +4,7 @@ use amqprs::callbacks::{DefaultChannelCallback, DefaultConnectionCallback};
 use amqprs::channel::{BasicConsumeArguments, QueueBindArguments, QueueDeclareArguments};
 use amqprs::connection::{Connection, OpenConnectionArguments};
 use amqprs::consumer::DefaultConsumer;
-use rocket::tokio::sync::Notify;
+use rocket::tokio::signal;
 use sqlx::postgres::PgPoolOptions;
 
 use crate::consumers::RabbitMQConsumer;
@@ -55,8 +55,8 @@ pub async fn rabbit_main() -> Result<(), String> {
         .await
         .unwrap();
 
-    let guard = Notify::new();
-    guard.notified().await;
-
-    Ok(())
+    return match signal::ctrl_c().await {
+        Ok(()) => Ok(()),
+        Err(err) => Err(format!("Failed to listen for ctrl+c because of {}", err))
+    }
 }
