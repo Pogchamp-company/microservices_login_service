@@ -38,3 +38,5 @@ clippy::needless_return should be ignored.
 As omitted "return" in medium/large functions does not do anything good, but confuse people from other languages.
 
 Use clippy to catch all inconveniences
+
+## [RabbitMQ consumers documentation](src/consumers/README.md)
