@@ -39,4 +39,9 @@ As omitted "return" in medium/large functions does not do anything good, but con
 
 Use clippy to catch all inconveniences
 
+### Run tests before committing
+```
+cargo test
+```
+
 ## [RabbitMQ consumers documentation](src/consumers/README.md)
