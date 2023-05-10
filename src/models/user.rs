@@ -21,7 +21,7 @@ pub async fn create_user(email: &str, password: &str, employee_id: i32, poll: &P
     };
 }
 
-pub async fn delete_user(email: &str, pool: &PgPool) -> Result<(), String> {
+pub async fn delete_user_by_email(email: &str, pool: &PgPool) -> Result<(), String> {
     let result = sqlx::query!(r#"
         DELETE FROM "user" WHERE email = $1
     "#, email)
@@ -30,6 +30,22 @@ pub async fn delete_user(email: &str, pool: &PgPool) -> Result<(), String> {
         Ok(result) => {
             if result.rows_affected() == 0 {
                 return Err(format!("User {} already do not exist, so we can not delete them", email));
+            }
+            Ok(())
+        },
+        Err(error) => Err(error.to_string())
+    }
+}
+
+pub async fn delete_user_by_employee_id(employee_id: i32, pool: &PgPool) -> Result<(), String> {
+    let result = sqlx::query!(r#"
+        DELETE FROM "user" WHERE employee_id = $1
+    "#, employee_id)
+        .execute(pool).await;
+    return match result {
+        Ok(result) => {
+            if result.rows_affected() == 0 {
+                return Err(format!("User with employee_id={} already do not exist, so we can not delete them", employee_id));
             }
             Ok(())
         },
@@ -97,7 +113,7 @@ pub async fn check_user_role(email: &str, role: &UserRole, poll: &PgPool) -> boo
 #[cfg(test)]
 mod test {
     use sqlx::PgPool;
-    use crate::models::user::{create_user, delete_user, load_user, LoadUserUserResult};
+    use crate::models::user::{create_user, delete_user_by_email, load_user, LoadUserUserResult};
 
     #[sqlx::test]
     pub async fn test_create_and_load_user(pool: PgPool) -> Result<(), String> {
@@ -123,7 +139,7 @@ mod test {
 
         create_user(email, password, employee_id, &pool).await?;
 
-        delete_user(email, &pool).await?;
+        delete_user_by_email(email, &pool).await?;
 
         let user = load_user(email, &pool).await;
 

@@ -19,6 +19,6 @@
 ### Schema example
 ```json
 {
-    "email": "example@example.com"
+    "employee_id": 1
 }
 ```
