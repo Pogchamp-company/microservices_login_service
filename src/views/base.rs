@@ -24,20 +24,38 @@ pub fn format_to_error_json(detail: String) -> Option<ErrorJson> {
 
 impl From<UserTokenError> for Unauthorized<Json<ErrorJsonFormat>> {
     fn from(value: UserTokenError) -> Self {
+        let error_message = match value {
+            UserTokenError::Missing { message }
+            | UserTokenError::BadCount { message }
+            | UserTokenError::Parse { message }
+            | UserTokenError::EmailNotFound { message } => {
+                message
+            }
+        };
+
         return Unauthorized(Some(Json(
             ErrorJsonFormat {
-                detail: serde_json::to_string(&value).unwrap()
+                detail: error_message
             }
-        )))
+        )));
     }
 }
 
 impl From<UserTokenError> for Custom<ErrorJson> {
     fn from(value: UserTokenError) -> Self {
+        let error_message = match value {
+            UserTokenError::Missing { message }
+            | UserTokenError::BadCount { message }
+            | UserTokenError::Parse { message }
+            | UserTokenError::EmailNotFound { message } => {
+                message
+            }
+        };
+
         return Custom(Status::Unauthorized, Json(
             ErrorJsonFormat {
-                detail: serde_json::to_string(&value).unwrap()
+                detail: error_message
             }
-        ))
+        ));
     }
 }

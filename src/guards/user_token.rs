@@ -20,10 +20,10 @@ pub struct UserTokenInfo {
 
 #[derive(Debug, Serialize)]
 pub enum UserTokenError {
-    Missing,
-    BadCount,
-    Parse,
-    EmailNotFound,
+    Missing { message: String },
+    BadCount { message: String },
+    Parse { message: String },
+    EmailNotFound { message: String },
 }
 
 #[rocket::async_trait]
@@ -33,11 +33,15 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let tokens: Vec<_> = request.headers().get("Authorization").collect();
         if tokens.is_empty() {
-            return Outcome::Failure((Status::Unauthorized, UserTokenError::Missing));
+            return Outcome::Failure((Status::Unauthorized, UserTokenError::Missing {
+                message: "Токен не предоставлен".to_string()
+            }));
         }
 
         if tokens.len() > 1 {
-            return Outcome::Failure((Status::Unauthorized, UserTokenError::BadCount));
+            return Outcome::Failure((Status::Unauthorized, UserTokenError::BadCount {
+                message: "Несколько токенов".to_string()
+            }));
         }
 
         let token = tokens[0];
@@ -47,8 +51,10 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
         let email = match email {
             Ok(email) => email,
 
-            Err(..) => {
-                return Outcome::Failure((Status::Unauthorized, UserTokenError::Parse));
+            Err(error_message) => {
+                return Outcome::Failure((Status::Unauthorized, UserTokenError::Parse {
+                    message: error_message,
+                }));
             }
         };
 
@@ -59,8 +65,10 @@ impl<'r> FromRequest<'r> for UserTokenInfo {
         let user = match user {
             Ok(user) => user,
 
-            Err(..) => {
-                return Outcome::Failure((Status::Unauthorized, UserTokenError::EmailNotFound));
+            Err(error_message) => {
+                return Outcome::Failure((Status::Unauthorized, UserTokenError::EmailNotFound {
+                    message: error_message,
+                }));
             }
         };
 
