@@ -93,3 +93,47 @@ pub async fn check_user_role(email: &str, role: &UserRole, poll: &PgPool) -> boo
         }
     };
 }
+
+#[cfg(test)]
+mod test {
+    use sqlx::PgPool;
+    use crate::models::user::{create_user, delete_user, load_user, LoadUserUserResult};
+
+    #[sqlx::test]
+    pub async fn test_create_and_load_user(pool: PgPool) -> Result<(), String> {
+        let email = "test@test.com";
+        let password = "qwerty";
+        let employee_id = 1;
+
+        create_user(email, password, employee_id, &pool).await?;
+
+        let user = load_user(email, &pool).await?;
+
+        assert_eq!(user.email.as_str(), email);
+        assert_eq!(user.roles, vec![]);
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    pub async fn test_create_and_delete_user(pool: PgPool) -> Result<(), String> {
+        let email = "test@test.com";
+        let password = "qwerty";
+        let employee_id = 1;
+
+        create_user(email, password, employee_id, &pool).await?;
+
+        delete_user(email, &pool).await?;
+
+        let user = load_user(email, &pool).await;
+
+        match user {
+            Ok(user) => {
+                return Err(format!("User {} was not deleted", user.email))
+            }
+            Err(_) => {}
+        }
+
+        Ok(())
+    }
+}
