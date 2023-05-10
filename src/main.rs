@@ -14,6 +14,8 @@ mod rocket_main;
 mod rabbitmq_main;
 mod cli_handler;
 
+mod database_connection;
+
 #[tokio::main]
 async fn main() -> Result<(), String> {
     dotenv().ok();

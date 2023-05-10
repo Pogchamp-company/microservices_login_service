@@ -1,13 +1,12 @@
 use std::env;
 
 use amqprs::callbacks::{DefaultChannelCallback, DefaultConnectionCallback};
-use amqprs::channel::{BasicConsumeArguments, QueueBindArguments, QueueDeclareArguments};
+use amqprs::channel::{BasicConsumeArguments, QueueDeclareArguments};
 use amqprs::connection::{Connection, OpenConnectionArguments};
-use amqprs::consumer::DefaultConsumer;
 use rocket::tokio::signal;
-use sqlx::postgres::PgPoolOptions;
 
 use crate::consumers::RabbitMQConsumer;
+use crate::database_connection::create_connection_pool;
 
 pub async fn rabbit_main() -> Result<(), String> {
     let addr = env::var("RABBITMQ_URI").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
@@ -22,10 +21,7 @@ pub async fn rabbit_main() -> Result<(), String> {
         .await
         .unwrap();
 
-    let db_uri = env::var("DATABASE_URL").expect("DATABASE_URI not provided in .env");
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&db_uri).await.expect("Pool was not created");
+    let database_connection_pool = create_connection_pool();
 
     // open a channel on the connection
     let channel = connection.open_channel(None).await.unwrap();
@@ -51,7 +47,7 @@ pub async fn rabbit_main() -> Result<(), String> {
     );
 
     channel
-        .basic_consume(RabbitMQConsumer::new(pool), args)
+        .basic_consume(RabbitMQConsumer::new(database_connection_pool.await), args)
         .await
         .unwrap();
 

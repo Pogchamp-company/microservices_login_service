@@ -1,4 +1,3 @@
-use std::time::SystemTime;
 use amqp_serde::types::{FieldName, FieldValue};
 use amqprs::{BasicProperties, Deliver};
 use amqprs::channel::{BasicAckArguments, Channel};
