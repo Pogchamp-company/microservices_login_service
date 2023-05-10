@@ -5,7 +5,6 @@ pub fn index() -> &'static str {
 
 #[cfg(test)]
 mod test {
-    use rocket::futures::task::Spawn;
     use rocket::http::Status;
     use rocket::local::asynchronous::Client;
     use sqlx::PgPool;

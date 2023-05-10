@@ -48,16 +48,16 @@ pub async fn delete_user_by_employee_id(employee_id: i32, pool: &PgPool) -> Resu
                 return Err(format!("User with employee_id={} already do not exist, so we can not delete them", employee_id));
             }
             Ok(())
-        },
+        }
         Err(error) => Err(error.to_string())
-    }
+    };
 }
 
 #[derive(Default)]
 pub struct LoadUserUserResult {
     pub email: String,
     pub password: String,
-    pub roles: Vec<UserRole>
+    pub roles: Vec<UserRole>,
 }
 
 pub async fn load_user(email: &str, poll: &PgPool) -> Result<LoadUserUserResult, String> {
@@ -78,7 +78,7 @@ pub async fn load_user(email: &str, poll: &PgPool) -> Result<LoadUserUserResult,
             Ok(LoadUserUserResult {
                 password: user_record.password,
                 email: email.to_string(),
-                roles: user_record.roles.unwrap()
+                roles: user_record.roles.unwrap(),
             })
         }
         Err(err) => match err {
@@ -112,43 +112,121 @@ pub async fn check_user_role(email: &str, role: &UserRole, poll: &PgPool) -> boo
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashSet;
     use sqlx::PgPool;
-    use crate::models::user::{create_user, delete_user_by_email, load_user, LoadUserUserResult};
+    use crate::models::user::{create_user, delete_user_by_email, delete_user_by_employee_id, load_user};
+    use crate::models::user_role::{add_roles, UserRole};
+
+    static TEST_USER_EMAIL: &str = "test@test.com";
+    static TEST_USER_PASSWORD: &str = "qwerty";
+    static TEST_USER_EMPLOYEE_ID: i32 = 1;
 
     #[sqlx::test]
     pub async fn test_create_and_load_user(pool: PgPool) -> Result<(), String> {
-        let email = "test@test.com";
-        let password = "qwerty";
-        let employee_id = 1;
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
 
-        create_user(email, password, employee_id, &pool).await?;
+        let user = load_user(TEST_USER_EMAIL, &pool).await?;
 
-        let user = load_user(email, &pool).await?;
-
-        assert_eq!(user.email.as_str(), email);
+        assert_eq!(user.email.as_str(), TEST_USER_EMAIL);
         assert_eq!(user.roles, vec![]);
 
         Ok(())
     }
 
     #[sqlx::test]
-    pub async fn test_create_and_delete_user(pool: PgPool) -> Result<(), String> {
-        let email = "test@test.com";
-        let password = "qwerty";
-        let employee_id = 1;
+    pub async fn test_delete_user_by_email(pool: PgPool) -> Result<(), String> {
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
 
-        create_user(email, password, employee_id, &pool).await?;
+        delete_user_by_email(TEST_USER_EMAIL, &pool).await?;
 
-        delete_user_by_email(email, &pool).await?;
+        let user = load_user(TEST_USER_EMAIL, &pool).await;
 
-        let user = load_user(email, &pool).await;
-
-        match user {
-            Ok(user) => {
-                return Err(format!("User {} was not deleted", user.email))
-            }
-            Err(_) => {}
+        if let Ok(user) = user {
+            return Err(format!("User {} was not deleted", user.email));
         }
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    pub async fn test_delete_user_by_employee_id(pool: PgPool) -> Result<(), String> {
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        delete_user_by_employee_id(TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        let user = load_user(TEST_USER_EMAIL, &pool).await;
+
+        // User should not be found
+        if let Ok(user) = user {
+            return Err(format!("User {} was not deleted", user.email));
+        }
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    pub async fn test_add_roles(pool: PgPool) -> Result<(), String> {
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        let roles_to_add = [UserRole::HumanResources, UserRole::Director];
+
+        add_roles(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
+
+        let user = load_user(TEST_USER_EMAIL, &pool).await?;
+
+        assert_eq!(user.roles, roles_to_add);
+
+        Ok(())
+    }
+
+    /// Check that addition of existing roles does not create duplicates of roles
+    #[sqlx::test]
+    pub async fn test_add_roles_with_overlap(pool: PgPool) -> Result<(), String> {
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        let roles_to_add_first = [UserRole::HumanResources, UserRole::Director];
+        let roles_to_add_second = [UserRole::Director, UserRole::TaskManager];
+
+        add_roles(TEST_USER_EMAIL, &roles_to_add_first, &pool).await?;
+        // UserRole::Director should not be duplicated
+        add_roles(TEST_USER_EMAIL, &roles_to_add_second, &pool).await?;
+
+        let user = load_user(TEST_USER_EMAIL, &pool).await?;
+
+        // Union set of roles
+        let roles_union: HashSet<UserRole> = HashSet::from(roles_to_add_first)
+            .union(&HashSet::from(roles_to_add_second)).copied().collect();
+
+        assert_eq!(HashSet::from_iter(user.roles), roles_union);
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    pub async fn test_delete_user_with_roles(pool: PgPool) -> Result<(), String> {
+        create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        let roles_to_add = [UserRole::HumanResources, UserRole::Director];
+
+        add_roles(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
+
+        delete_user_by_employee_id(TEST_USER_EMPLOYEE_ID, &pool).await?;
+
+        let user = load_user(TEST_USER_EMAIL, &pool).await;
+
+        // User should not be found
+        if let Ok(user) = user {
+            return Err(format!("User {} was not deleted", user.email));
+        }
+
+        let user_to_role_entries = sqlx::query!(r#"
+            SELECT count(role) as "count!" FROM user_to_role WHERE user_email = $1
+        "#, TEST_USER_EMAIL).fetch_one(&pool).await;
+
+        let user_to_role_entries = user_to_role_entries.map_err(|err| -> String {err.to_string()})?;
+
+        // Corresponding roles should be deleted
+        assert_eq!(user_to_role_entries.count, 0);
 
         Ok(())
     }
