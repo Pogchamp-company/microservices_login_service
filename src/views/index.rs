@@ -5,12 +5,10 @@ pub fn index() -> &'static str {
 
 #[cfg(test)]
 mod test {
-    use std::env;
     use rocket::futures::task::Spawn;
     use rocket::http::Status;
     use rocket::local::asynchronous::Client;
     use sqlx::PgPool;
-    use crate::database_connection::create_connection_pool;
     use crate::rocket_main::create_rocket;
 
     #[sqlx::test]

@@ -1,7 +1,6 @@
 use rocket::http::Status;
 use rocket::response::status::{Custom, Unauthorized};
 use rocket::serde::json::Json;
-use rocket::serde::json::serde_json;
 use schemars::JsonSchema;
 use serde::Serialize;
 
