@@ -1,31 +1,18 @@
-#[macro_use]
-extern crate rocket;
-
 use dotenv::dotenv;
 use rocket::tokio;
 
-pub mod views;
-pub mod password_utils;
-pub mod models;
-pub mod guards;
-pub mod consumers;
 
-mod rocket_main;
-mod rabbitmq_main;
-mod cli_handler;
-
-mod database_connection;
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
     dotenv().ok();
 
-    if cli_handler::handle_console_command().await? {
+    if login_service::cli_handler::handle_console_command().await? {
         return Ok(());
     }
 
-    let rocket_handle = rocket_main::rocket_main();
-    let rabbit_handle = rabbitmq_main::rabbit_main();
+    let rocket_handle = login_service::rocket_main::rocket_main();
+    let rabbit_handle = login_service::rabbitmq_main::rabbit_main();
 
     let (rocket_result, rabbit_result) = tokio::join!(rocket_handle, rabbit_handle);
 
