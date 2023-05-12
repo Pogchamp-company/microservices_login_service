@@ -3,13 +3,16 @@ use amqprs::{BasicProperties, Deliver};
 use amqprs::channel::{BasicAckArguments, Channel};
 use amqprs::consumer::AsyncConsumer;
 use rocket::serde::json::serde_json;
+use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::consumers::create_user::CreateUserSchema;
 use crate::consumers::delete_user::DeleteUserSchema;
+use crate::consumers::overwrite_roles::OverwriteRolesSchema;
 
 mod create_user;
 mod delete_user;
+mod overwrite_roles;
 
 pub struct RabbitMQConsumer {
     database_connection: PgPool,
@@ -21,6 +24,34 @@ impl RabbitMQConsumer {
             database_connection
         };
     }
+}
+
+fn load_schema<'a, T: Deserialize<'a>>(raw_json: &'a str) -> Result<T, String> {
+    return match serde_json::from_str::<T>(raw_json) {
+        Ok(json_schema) => Ok(json_schema),
+        Err(..) => Err("Could not parse raw string into json".to_string())
+    };
+}
+
+async fn run_consumer(consumer_name: &str, raw_json_schema: &str, database_connection: &PgPool) -> Result<String, String> {
+    return match consumer_name {
+        "create_user" => {
+            let json: CreateUserSchema = load_schema(raw_json_schema)?;
+
+            create_user::consume(json, database_connection).await
+        }
+        "delete_user" => {
+            let json: DeleteUserSchema = load_schema(raw_json_schema)?;
+
+            delete_user::consume(json, database_connection).await
+        }
+        "overwrite_roles" => {
+            let json: OverwriteRolesSchema = load_schema(raw_json_schema)?;
+
+            overwrite_roles::consume(json, database_connection).await
+        }
+        unknown_command => Err(format!("Unknown command: {}", unknown_command))
+    };
 }
 
 #[async_trait]
@@ -61,31 +92,9 @@ impl AsyncConsumer for RabbitMQConsumer {
             }
         };
 
-        let result: Result<String, String> = match command.as_str() {
-            "create_user" => {
-                let json: CreateUserSchema = match serde_json::from_str(raw_string) {
-                    Ok(raw_string) => raw_string,
-                    Err(..) => {
-                        println!("Could not parse raw string into json");
-                        return;
-                    }
-                };
-
-                create_user::consume(json, &self.database_connection).await
-            },
-            "delete_user" => {
-                let json: DeleteUserSchema = match serde_json::from_str(raw_string) {
-                    Ok(raw_string) => raw_string,
-                    Err(..) => {
-                        println!("Could not parse raw string into json");
-                        return;
-                    }
-                };
-
-                delete_user::consume(json, &self.database_connection).await
-            },
-            unknown_command => Err(format!("Unknown command: {}", unknown_command))
-        };
+        let result: Result<String, String> = run_consumer(&command,
+                                                          raw_string,
+                                                          &self.database_connection).await;
 
         match result {
             Ok(success_message) => {

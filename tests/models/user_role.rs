@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use sqlx::PgPool;
 use login_service::models::user::{create_user, delete_user_by_employee_id, load_user};
-use login_service::models::user_role::{add_roles, UserRole};
+use login_service::models::user_role::{add_roles_by_email, UserRole};
 
 static TEST_USER_EMAIL: &str = "test@test.com";
 static TEST_USER_PASSWORD: &str = "qwerty";
@@ -13,7 +13,7 @@ pub async fn test_add_roles(pool: PgPool) -> Result<(), String> {
 
     let roles_to_add = [UserRole::HumanResources, UserRole::Director];
 
-    add_roles(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
+    add_roles_by_email(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
 
     let user = load_user(TEST_USER_EMAIL, &pool).await?;
 
@@ -30,9 +30,9 @@ pub async fn test_add_roles_with_overlap(pool: PgPool) -> Result<(), String> {
     let roles_to_add_first = [UserRole::HumanResources, UserRole::Director];
     let roles_to_add_second = [UserRole::Director, UserRole::TaskManager];
 
-    add_roles(TEST_USER_EMAIL, &roles_to_add_first, &pool).await?;
+    add_roles_by_email(TEST_USER_EMAIL, &roles_to_add_first, &pool).await?;
     // UserRole::Director should not be duplicated
-    add_roles(TEST_USER_EMAIL, &roles_to_add_second, &pool).await?;
+    add_roles_by_email(TEST_USER_EMAIL, &roles_to_add_second, &pool).await?;
 
     let user = load_user(TEST_USER_EMAIL, &pool).await?;
 
@@ -51,7 +51,7 @@ pub async fn test_delete_user_with_roles(pool: PgPool) -> Result<(), String> {
 
     let roles_to_add = [UserRole::HumanResources, UserRole::Director];
 
-    add_roles(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
+    add_roles_by_email(TEST_USER_EMAIL, &roles_to_add, &pool).await?;
 
     delete_user_by_employee_id(TEST_USER_EMPLOYEE_ID, &pool).await?;
 

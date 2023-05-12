@@ -3,7 +3,7 @@ use std::env;
 use sqlx::postgres::PgPoolOptions;
 
 use crate::models::user::create_user;
-use crate::models::user_role::{add_roles, UserRole};
+use crate::models::user_role::{add_roles_by_email, UserRole};
 
 pub async fn handle_create_director(mut args: Vec<String>) -> Result<String, String> {
     let admin_email = args.pop();
@@ -20,7 +20,7 @@ pub async fn handle_create_director(mut args: Vec<String>) -> Result<String, Str
             .await.expect("Migrations failed");
 
         create_user(&admin_email, &admin_password, 0, &pool).await?;
-        add_roles(&admin_email, &[UserRole::Director], &pool).await?;
+        add_roles_by_email(&admin_email, &[UserRole::Director], &pool).await?;
 
         return Ok("Admin created successfully!".to_string());
     }

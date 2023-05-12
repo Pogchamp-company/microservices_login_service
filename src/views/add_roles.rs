@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 use crate::guards::user_token::{UserTokenError, UserTokenInfo};
 use crate::models::user::load_user;
-use crate::models::user_role::{add_roles, UserRole};
+use crate::models::user_role::{add_roles_by_email, UserRole};
 use crate::models::user_role::has_permission_to_add_roles;
 use crate::views::base::{ErrorJson, format_to_error_json};
 
@@ -44,7 +44,7 @@ pub async fn add_roles_view(add_roles_request: Json<AddRolesRequest>,
         return Err(status::Custom(Status::BadRequest, format_to_error_json(error_message).unwrap()));
     }
 
-    add_roles(&add_roles_request.email, &add_roles_request.roles, pool)
+    add_roles_by_email(&add_roles_request.email, &add_roles_request.roles, pool)
         .await
         .map_err(|error_message| {
             status::Custom(Status::InternalServerError, format_to_error_json(error_message).unwrap())

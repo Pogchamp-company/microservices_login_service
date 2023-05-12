@@ -22,3 +22,15 @@
     "employee_id": 1
 }
 ```
+
+## Overwrite roles
+Deletes current user roles and adds supplied roles
+### Command name: ```overwrite_roles```
+
+### Schema example
+```json
+{
+    "employee_id": 1,
+    "roles": ["task_manager"]
+}
+```
