@@ -1,6 +1,6 @@
-mod delete_roles_by_employee_id;
-mod add_roles_by_employee_id;
-mod add_roles_by_email;
+mod delete_by_email;
+mod delete_user_by_employee_id;
+mod create_and_load;
 
 static TEST_USER_EMAIL: &str = "test@test.com";
 static TEST_USER_PASSWORD: &str = "qwerty";

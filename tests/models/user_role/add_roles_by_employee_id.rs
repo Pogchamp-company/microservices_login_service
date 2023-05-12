@@ -1,10 +1,7 @@
 use sqlx::PgPool;
 use login_service::models::user::{create_user, load_user};
-use login_service::models::user_role::{add_roles_by_email, add_roles_by_employee_id, UserRole};
-
-static TEST_USER_EMAIL: &str = "test@test.com";
-static TEST_USER_PASSWORD: &str = "qwerty";
-static TEST_USER_EMPLOYEE_ID: i32 = 1;
+use login_service::models::user_role::{add_roles_by_employee_id, UserRole};
+use crate::models::user_role::{TEST_USER_EMAIL, TEST_USER_EMPLOYEE_ID, TEST_USER_PASSWORD};
 
 #[sqlx::test]
 pub async fn test_add_roles_by_employee_id(pool: PgPool) -> Result<(), String> {
