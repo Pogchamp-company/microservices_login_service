@@ -6,7 +6,7 @@ use serde::Serialize;
 use sqlx::PgPool;
 
 use crate::guards::user_token::{UserTokenError, UserTokenInfo};
-use crate::models::user::check_user_role;
+use crate::models::user_role::check_user_role;
 use crate::models::user_role::UserRole;
 use crate::views::base::{ErrorJson, format_to_error_json};
 

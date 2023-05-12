@@ -1,8 +1,5 @@
-use login_service::models::user::*;
-
 use sqlx::PgPool;
 use login_service::models::user::{create_user, delete_user_by_email, delete_user_by_employee_id, load_user};
-use login_service::models::user_role::{add_roles, UserRole};
 
 static TEST_USER_EMAIL: &str = "test@test.com";
 static TEST_USER_PASSWORD: &str = "qwerty";
