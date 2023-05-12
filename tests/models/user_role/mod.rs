@@ -1,3 +1,6 @@
+mod delete_roles_by_employee_id;
+mod add_roles_by_employee_id;
+
 use std::collections::HashSet;
 use sqlx::PgPool;
 use login_service::models::user::{create_user, delete_user_by_employee_id, load_user};
@@ -8,7 +11,7 @@ static TEST_USER_PASSWORD: &str = "qwerty";
 static TEST_USER_EMPLOYEE_ID: i32 = 1;
 
 #[sqlx::test]
-pub async fn test_add_roles(pool: PgPool) -> Result<(), String> {
+pub async fn test_add_roles_by_email(pool: PgPool) -> Result<(), String> {
     create_user(TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_EMPLOYEE_ID, &pool).await?;
 
     let roles_to_add = [UserRole::HumanResources, UserRole::Director];
