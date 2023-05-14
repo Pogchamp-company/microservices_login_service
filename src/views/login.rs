@@ -10,16 +10,16 @@ use crate::models::user_role::UserRole;
 use crate::password_utils::{create_jwt, hash_password};
 use crate::views::base::{ErrorJson, format_to_error_json};
 
-#[derive(Debug, Deserialize, JsonSchema)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct LoginRequest {
-    email: String,
-    password: String
+    pub email: String,
+    pub password: String
 }
 
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct LoginResponse {
-    token: String,
-    roles: Vec<UserRole>
+    pub token: String,
+    pub roles: Vec<UserRole>
 }
 
 /// # Log in and get token
