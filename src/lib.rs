@@ -10,5 +10,6 @@ pub mod consumers;
 pub mod database_connection;
 
 pub mod rabbitmq_main;
+pub mod rocket_cors;
 pub mod rocket_main;
 pub mod cli_handler;

@@ -1,10 +1,13 @@
 use std::env;
 
-use rocket::{Build, Rocket, routes};
+use rocket::{Build, Request, Response, Rocket, routes};
+use rocket::fairing::{Fairing, Info, Kind};
+use rocket::http::{Header, Method};
 use rocket_okapi::openapi_get_routes;
 use rocket_okapi::swagger_ui::{make_swagger_ui, SwaggerUIConfig};
 use sqlx::PgPool;
 use crate::database_connection::create_connection_pool;
+use crate::rocket_cors::{Cors, all_options};
 
 use crate::views::add_roles::add_roles_view;
 use crate::views::add_roles::okapi_add_operation_for_add_roles_view_;
@@ -18,6 +21,8 @@ use crate::views::login::okapi_add_operation_for_login_;
 
 pub fn create_rocket(database_connection_pool: PgPool) -> Rocket<Build> {
     rocket::build()
+        .attach(Cors)
+        .mount("/", routes![all_options])
         .manage::<PgPool>(database_connection_pool)
         .mount("/", routes![index])
         .mount("/auth", openapi_get_routes![check_access_token, login, check_role, add_roles_view])
